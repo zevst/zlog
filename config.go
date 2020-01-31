@@ -6,8 +6,6 @@ import (
 	"os"
 )
 
-type Option func(*config)
-
 type Setting struct {
 	Level  Level              `mapstructure:"level"`
 	Format Format             `mapstructure:"format"`
@@ -47,19 +45,18 @@ func (c *config) Core() zapcore.Core {
 	return zapcore.NewCore(c.format.Encoder(c.encCfg), c.writer, c.level)
 }
 
-func WithSetting(setting *Setting) Option {
-	return func(c *config) {
-		if setting.Format != 0 {
-			c.format = setting.Format
-		}
-		if setting.Level != 0 {
-			c.level = setting.Level.Zap()
-		}
-		if setting.Out != nil {
-			c.writer = zapcore.AddSync(setting.Out)
-		}
-		if setting.Color {
-			c.encCfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
-		}
+func (c *config) withSetting(setting *Setting) *config {
+	if setting.Format != 0 {
+		c.format = setting.Format
 	}
+	if setting.Level != 0 {
+		c.level = setting.Level.Zap()
+	}
+	if setting.Out != nil {
+		c.writer = zapcore.AddSync(setting.Out)
+	}
+	if setting.Color {
+		c.encCfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	}
+	return c
 }

@@ -18,9 +18,7 @@ func (m MultiLogger) Core() zapcore.Core {
 }
 
 func (s *Setting) Core() zapcore.Core {
-	c := Default()
-	WithSetting(s)(c)
-	return c.Core()
+	return Default().withSetting(s).Core()
 }
 
 type Logger struct {
@@ -60,6 +58,10 @@ func (l *Logger) Print(v ...interface{})                 { l.zapLog.Debug(fmt.Sp
 func (l *Logger) Printf(format string, v ...interface{}) { l.zapLog.Debug(fmt.Sprintf(format, v...)) }
 func (l *Logger) Println(v ...interface{})               { l.zapLog.Debug(fmt.Sprint(v...)) }
 func (l *Logger) Write(p []byte) (n int, err error)      { l.zapLog.Debug(string(p)); return len(p), nil }
+
+func (l *Logger) Zap() *zap.Logger {
+	return l.zapLog
+}
 
 func (l *Logger) WithOptions(opts ...zap.Option) *Logger {
 	l.zapLog.WithOptions(opts...)
