@@ -1,4 +1,4 @@
-package log
+package zlog
 
 import (
 	"go.uber.org/zap/zapcore"
@@ -11,6 +11,7 @@ type Option func(*config)
 type Setting struct {
 	Level  Level              `mapstructure:"level"`
 	Format Format             `mapstructure:"format"`
+	Color  bool               `mapstructure:"color"`
 	Out    *lumberjack.Logger `mapstructure:"out"`
 }
 
@@ -30,7 +31,7 @@ var DefaultEncoderConfig = zapcore.EncoderConfig{
 	StacktraceKey: "S",
 	LineEnding:    zapcore.DefaultLineEnding,
 
-	EncodeLevel:    zapcore.CapitalColorLevelEncoder,
+	EncodeLevel:    zapcore.CapitalLevelEncoder,
 	EncodeTime:     zapcore.RFC3339TimeEncoder,
 	EncodeDuration: zapcore.StringDurationEncoder,
 	EncodeCaller:   zapcore.ShortCallerEncoder,
@@ -56,6 +57,9 @@ func WithSetting(setting *Setting) Option {
 		}
 		if setting.Out != nil {
 			c.writer = zapcore.AddSync(setting.Out)
+		}
+		if setting.Color {
+			c.encCfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
 		}
 	}
 }

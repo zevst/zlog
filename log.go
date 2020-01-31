@@ -1,4 +1,4 @@
-package log
+package zlog
 
 import (
 	"fmt"
@@ -7,26 +7,43 @@ import (
 	"os"
 )
 
-type MultiLogger map[string]*Logger
+type MultiLogger map[string]*Setting
+
+func (m MultiLogger) Core() zapcore.Core {
+	var cores []zapcore.Core
+	for _, logger := range m {
+		cores = append(cores, logger.Core())
+	}
+	return zapcore.NewTee(cores...)
+}
+
+func (s *Setting) Core() zapcore.Core {
+	c := Default()
+	WithSetting(s)(c)
+	return c.Core()
+}
 
 type Logger struct {
 	zapLog *zap.Logger
 }
 
-var logger *Logger
+var logger = new(Logger)
 
 func init() {
 	core := zapcore.NewCore(zapcore.NewJSONEncoder(DefaultEncoderConfig), os.Stdout, zapcore.DebugLevel)
 	logger.zapLog = zap.New(core).WithOptions(zap.AddCaller(), zap.AddCallerSkip(1), zap.AddStacktrace(zap.DPanicLevel))
 }
 
-func New(opts ...Option) *Logger {
-	c := Default()
-	for _, opt := range opts {
-		opt(c)
-	}
-	logger.zapLog = zap.New(c.Core())
+func Start(core zapcore.Core, opts ...zap.Option) {
+	logger.zapLog = zap.New(core, opts...)
+}
+
+func Get() *Logger {
 	return logger
+}
+
+func End() {
+	_ = logger.zapLog.Sync()
 }
 
 func Debug(msg string, fields ...zap.Field)  { logger.zapLog.Debug(msg, fields...) }
