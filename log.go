@@ -52,8 +52,8 @@ func DPanic(msg string, fields ...zap.Field) { logger.zapLog.DPanic(msg, fields.
 func Panic(msg string, fields ...zap.Field)  { logger.zapLog.Panic(msg, fields...) }
 func Fatal(msg string, fields ...zap.Field)  { logger.zapLog.Fatal(msg, fields...) }
 
-func (l *Logger) Error(msg string)                       { l.Printf("ERROR: %s", msg) }
-func (l *Logger) Infof(msg string, args ...interface{})  { l.Printf(msg, args...) }
+func (l *Logger) Error(msg string)                       { l.zapLog.Debug(fmt.Sprintf("ERROR: %s", msg)) }
+func (l *Logger) Infof(msg string, args ...interface{})  { l.zapLog.Debug(fmt.Sprintf(msg, args...)) }
 func (l *Logger) Print(v ...interface{})                 { l.zapLog.Debug(fmt.Sprint(v...)) }
 func (l *Logger) Printf(format string, v ...interface{}) { l.zapLog.Debug(fmt.Sprintf(format, v...)) }
 func (l *Logger) Println(v ...interface{})               { l.zapLog.Debug(fmt.Sprint(v...)) }
