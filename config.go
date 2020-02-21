@@ -54,7 +54,7 @@ func (c *config) withSetting(setting *Setting) *config {
 	if setting.Out != nil {
 		c.writer = zapcore.AddSync(setting.Out)
 	}
-	if setting.Color {
+	if setting.Color && c.format == Console {
 		c.encCfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	}
 	return c
