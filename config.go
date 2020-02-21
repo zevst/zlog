@@ -3,7 +3,6 @@ package zlog
 import (
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
-	"os"
 )
 
 type Setting struct {
@@ -20,7 +19,7 @@ type config struct {
 	level  zapcore.LevelEnabler
 }
 
-var DefaultEncoderConfig = zapcore.EncoderConfig{
+var encoderConfig = zapcore.EncoderConfig{
 	MessageKey:    "M",
 	LevelKey:      "L",
 	TimeKey:       "T",
@@ -37,8 +36,8 @@ var DefaultEncoderConfig = zapcore.EncoderConfig{
 	EncodeName: zapcore.FullNameEncoder,
 }
 
-func Default() *config {
-	return &config{format: Json, encCfg: DefaultEncoderConfig, writer: os.Stdout, level: zapcore.DebugLevel}
+func SetEncoderConfig(cfg zapcore.EncoderConfig) {
+	encoderConfig = cfg
 }
 
 func (c *config) Core() zapcore.Core {

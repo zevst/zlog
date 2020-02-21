@@ -18,7 +18,13 @@ func (m MultiLogger) Core() zapcore.Core {
 }
 
 func (s *Setting) Core() zapcore.Core {
-	return Default().withSetting(s).Core()
+	c := &config{
+		format: Json,
+		encCfg: encoderConfig,
+		writer: os.Stdout,
+		level:  zapcore.DebugLevel,
+	}
+	return c.withSetting(s).Core()
 }
 
 type Logger struct {
@@ -28,7 +34,7 @@ type Logger struct {
 var logger = new(Logger)
 
 func init() {
-	core := zapcore.NewCore(zapcore.NewJSONEncoder(DefaultEncoderConfig), os.Stdout, zapcore.DebugLevel)
+	core := zapcore.NewCore(zapcore.NewJSONEncoder(encoderConfig), os.Stdout, zapcore.DebugLevel)
 	logger.zapLog = zap.New(core).WithOptions(zap.AddCaller(), zap.AddCallerSkip(1), zap.AddStacktrace(zap.DPanicLevel))
 }
 
